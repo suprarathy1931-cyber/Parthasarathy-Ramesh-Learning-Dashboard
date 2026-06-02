@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dev Roadmap // Progress Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #08080e;
+  --bg2: #0f0f1a;
+  --surface: #161624;
+  --surface2: #1e1e30;
+  --surface3: #252538;
+  --border: #2a2a40;
+  --text: #ede9fa;
+  --text2: #a09dc0;
+  --text3: #4e4a6a;
+  --accent: #7b6fff;
+  --accent2: #9d8fff;
+  --accent-dim: rgba(123,111,255,0.15);
+  --green: #34d399;
+  --green-dim: rgba(52,211,153,0.15);
+  --amber: #fbbf24;
+  --amber-dim: rgba(251,191,36,0.15);
+  --coral: #fb7185;
+  --coral-dim: rgba(251,113,133,0.15);
+  --blue: #60a5fa;
+  --sidebar-w: 240px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{font-size:14px;scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Instrument Sans',sans-serif;min-height:100vh;display:flex;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 60% 40% at 80% 20%,rgba(123,111,255,0.06) 0%,transparent 70%),radial-gradient(ellipse 40% 30% at 10% 80%,rgba(52,211,153,0.04) 0%,transparent 60%);pointer-events:none;z-index:0}
+
+/* ─── SCROLLBAR ─── */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+/* ─── LOADING OVERLAY ─── */
+#loader{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;transition:opacity .4s}
+#loader.hide{opacity:0;pointer-events:none}
+.loader-logo{font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;color:var(--accent);letter-spacing:-.02em;margin-bottom:1rem}
+.loader-bar{width:200px;height:2px;background:var(--surface3);border-radius:1px;overflow:hidden}
+.loader-fill{height:100%;width:0%;background:var(--accent);transition:width .3s;animation:loadpulse 1.2s ease-in-out infinite}
+@keyframes loadpulse{0%{width:0%}50%{width:70%}100%{width:100%}}
+.loader-text{font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--text3);margin-top:.75rem}
+
+/* ─── SIDEBAR ─── */
+#sidebar{width:var(--sidebar-w);min-height:100vh;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;z-index:10;flex-shrink:0}
+.sidebar-header{padding:1.25rem 1rem 1rem;border-bottom:1px solid var(--border)}
+.sidebar-logo{font-family:'Syne',sans-serif;font-size:1rem;font-weight:800;color:var(--text);letter-spacing:-.02em;line-height:1.2}
+.sidebar-logo span{color:var(--accent)}
+.sidebar-sub{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--text3);margin-top:.25rem}
+.sidebar-nav{flex:1;padding:.75rem 0;overflow-y:auto}
+.nav-section{margin-bottom:.25rem}
+.nav-label{font-family:'JetBrains Mono',monospace;font-size:.6rem;font-weight:700;color:var(--text3);letter-spacing:.1em;padding:.5rem 1rem .3rem;text-transform:uppercase}
+.nav-item{display:flex;align-items:center;gap:.5rem;padding:.4rem 1rem;cursor:pointer;transition:all .15s;border-left:2px solid transparent;color:var(--text2);font-size:.8rem;font-weight:500}
+.nav-item:hover{background:var(--surface);color:var(--text);border-left-color:var(--border)}
+.nav-item.active{background:var(--accent-dim);color:var(--accent);border-left-color:var(--accent)}
+.nav-dot{width:6px;height:6px;border-radius:50%;background:var(--text3);flex-shrink:0;transition:background .15s}
+.nav-item.active .nav-dot{background:var(--accent)}
+.nav-item:hover .nav-dot{background:var(--text2)}
+.sidebar-footer{padding:1rem;border-top:1px solid var(--border)}
+.xp-level{font-family:'Syne',sans-serif;font-size:.85rem;font-weight:700;color:var(--accent);margin-bottom:.4rem}
+.xp-label{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--text3);margin-bottom:.4rem}
+.xp-bar-wrap{background:var(--surface3);border-radius:2px;height:4px;overflow:hidden;margin-bottom:.5rem}
+.xp-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:2px;transition:width .7s cubic-bezier(.4,0,.2,1)}
+.sync-dot{display:flex;align-items:center;gap:.4rem;font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--text3)}
+.sync-dot::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--green);flex-shrink:0}
+.sync-dot.saving::before{background:var(--amber);animation:blink .6s infinite}
+.sync-dot.error::before{background:var(--coral)}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* ─── MAIN ─── */
+#main{flex:1;min-height:100vh;overflow-y:auto;position:relative;z-index:1}
+.main-inner{max-width:960px;margin:0 auto;padding:1.5rem 2rem 4rem}
+
+/* ─── TOP BAR ─── */
+.topbar{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1.5rem;gap:1rem}
+.topbar-left h1{font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;color:var(--text);letter-spacing:-.03em;line-height:1.1}
+.topbar-left .date{font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--text3);margin-top:.3rem}
+.streak-badge{display:flex;align-items:center;gap:.4rem;background:var(--amber-dim);border:1px solid rgba(251,191,36,.2);border-radius:6px;padding:.4rem .75rem;font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--amber);white-space:nowrap}
+
+/* ─── STATS ROW ─── */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem;margin-bottom:1.5rem}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:.875rem 1rem;transition:border-color .2s}
+.stat-card:hover{border-color:var(--accent)}
+.stat-val{font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;color:var(--text);line-height:1;margin-bottom:.25rem}
+.stat-val span{font-size:.9rem;color:var(--text3);font-weight:400}
+.stat-label{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--text3);text-transform:uppercase;letter-spacing:.05em}
+.stat-bar{height:2px;background:var(--surface3);border-radius:1px;margin-top:.6rem;overflow:hidden}
+.stat-bar-fill{height:100%;background:var(--accent);border-radius:1px;transition:width .7s ease}
+
+/* ─── SECTION HEADERS ─── */
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.875rem;margin-top:2rem}
+.section-title{font-family:'Syne',sans-serif;font-size:.8rem;font-weight:700;color:var(--text2);letter-spacing:.12em;text-transform:uppercase}
+.section-count{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--text3)}
+
+/* ─── PHASE CARDS ─── */
+.phase-list{display:flex;flex-direction:column;gap:.5rem}
+.phase-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden;transition:border-color .2s}
+.phase-card:hover{border-color:var(--accent)}
+.phase-card.unlocked{border-color:var(--border)}
+.phase-card.active-phase{border-color:rgba(123,111,255,.4)}
+.phase-header{display:flex;align-items:center;gap:.75rem;padding:.875rem 1rem;cursor:pointer;user-select:none}
+.phase-num{font-family:'JetBrains Mono',monospace;font-size:.65rem;font-weight:700;color:var(--accent);background:var(--accent-dim);border:1px solid rgba(123,111,255,.2);border-radius:4px;padding:.2rem .4rem;flex-shrink:0}
+.phase-title{flex:1;font-family:'Syne',sans-serif;font-size:.85rem;font-weight:700;color:var(--text)}
+.phase-duration{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--text3);flex-shrink:0}
+.phase-mini-bar{width:60px;height:3px;background:var(--surface3);border-radius:2px;overflow:hidden;flex-shrink:0}
+.phase-mini-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .7s ease}
+.phase-pct{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--text3);width:28px;text-align:right;flex-shrink:0}
+.phase-chevron{color:var(--text3);font-size:.7rem;transition:transform .25s;flex-shrink:0}
+.phase-card.open .phase-chevron{transform:rotate(90deg)}
+.phase-body{display:none;padding:0 1rem 1rem;border-top:1px solid var(--border)}
+.phase-card.open .phase-body{display:block}
+.phase-sections{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:.875rem}
+.phase-section-label{font-family:'JetBrains Mono',monospace;font-size:.6rem;font-weight:700;color:var(--text3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.5rem}
+.check-item{display:flex;align-items:flex-start;gap:.5rem;padding:.3rem 0;cursor:pointer;transition:opacity .15s}
+.check-item:hover{opacity:.8}
+.check-item input[type=checkbox]{appearance:none;width:14px;height:14px;border:1.5px solid var(--text3);border-radius:3px;flex-shrink:0;margin-top:1px;cursor:pointer;transition:all .15s;position:relative}
+.check-item input[type=checkbox]:checked{background:var(--accent);border-color:var(--accent)}
+.check-item input[type=checkbox]:checked::after{content:'✓';position:absolute;top:-1px;left:1px;font-size:9px;color:#fff;font-weight:700}
+.check-item label{font-size:.78rem;color:var(--text2);cursor:pointer;line-height:1.4;transition:color .15s}
+.check-item input:checked+label{color:var(--text3);text-decoration:line-through}
+.project-chips{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.1rem}
+.proj-chip{background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:.25rem .6rem;font-size:.72rem;color:var(--text2);cursor:pointer;transition:all .15s;font-family:'JetBrains Mono',monospace}
+.proj-chip:hover{border-color:var(--green);color:var(--green)}
+.proj-chip.built{background:var(--green-dim);border-color:rgba(52,211,153,.3);color:var(--green)}
+.phase-progress-bar{margin-top:.875rem;background:var(--surface3);border-radius:2px;height:3px;overflow:hidden}
+.phase-progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--green));border-radius:2px;transition:width .7s cubic-bezier(.4,0,.2,1)}
+.status-badge{display:inline-flex;align-items:center;gap:.3rem;font-family:'JetBrains Mono',monospace;font-size:.6rem;padding:.2rem .5rem;border-radius:3px;margin-top:.5rem}
+.status-badge.locked{background:var(--surface2);color:var(--text3);border:1px solid var(--border)}
+.status-badge.active{background:var(--amber-dim);color:var(--amber);border:1px solid rgba(251,191,36,.2)}
+.status-badge.done{background:var(--green-dim);color:var(--green);border:1px solid rgba(52,211,153,.2)}
+
+/* ─── LANGUAGE SECTION ─── */
+.lang-tier-label{font-family:'JetBrains Mono',monospace;font-size:.6rem;font-weight:700;color:var(--text3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.6rem;margin-top:1rem}
+.lang-tier-label:first-child{margin-top:0}
+.lang-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:.6rem;margin-bottom:.5rem}
+.lang-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:.75rem;transition:all .2s;cursor:default}
+.lang-card:hover{border-color:var(--accent)}
+.lang-flag{font-size:1.4rem;line-height:1;margin-bottom:.4rem}
+.lang-name{font-family:'Syne',sans-serif;font-size:.8rem;font-weight:700;color:var(--text);margin-bottom:.15rem}
+.lang-tier-tag{font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--text3);margin-bottom:.5rem}
+.lang-fluency-bar{background:var(--surface3);border-radius:2px;height:3px;overflow:hidden;margin-bottom:.5rem}
+.lang-fluency-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--blue));border-radius:2px;transition:width .7s ease}
+.lang-stats{display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem}
+.lang-pct{font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--accent);font-weight:700}
+.lang-sess{font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--text3)}
+.lang-btn{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:4px;color:var(--text2);font-size:.7rem;font-family:'JetBrains Mono',monospace;padding:.3rem;cursor:pointer;transition:all .15s;text-align:center}
+.lang-btn:hover{background:var(--accent-dim);border-color:var(--accent);color:var(--accent)}
+
+/* ─── DSA TRACKER ─── */
+.dsa-wrap{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem}
+.dsa-heatmap-section{}
+.dsa-heatmap-label{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--text3);margin-bottom:.6rem}
+.heatmap-grid{display:grid;grid-template-columns:repeat(26,1fr);gap:2px}
+.hm-cell{aspect-ratio:1;border-radius:1.5px;cursor:pointer;transition:all .1s;min-width:0}
+.hm-cell[data-v="0"]{background:var(--surface3)}
+.hm-cell[data-v="1"]{background:rgba(123,111,255,.3)}
+.hm-cell[data-v="2"]{background:rgba(123,111,255,.55)}
+.hm-cell[data-v="3"]{background:rgba(123,111,255,.78)}
+.hm-cell[data-v="4"]{background:var(--accent)}
+.hm-cell:hover{transform:scale(1.3);z-index:2;position:relative}
+.dsa-topics-section{}
+.topic-row{display:flex;align-items:center;gap:.6rem;margin-bottom:.5rem}
+.topic-name{font-size:.72rem;color:var(--text2);width:100px;flex-shrink:0;font-family:'Instrument Sans',sans-serif}
+.topic-bar-wrap{flex:1;background:var(--surface3);border-radius:2px;height:8px;cursor:pointer;overflow:hidden;border-radius:2px;transition:opacity .15s}
+.topic-bar-wrap:hover{opacity:.8}
+.topic-bar-fill{height:100%;border-radius:2px;transition:width .5s ease}
+.topic-count{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--text3);width:36px;text-align:right;flex-shrink:0}
+
+/* ─── SCHEDULE ─── */
+.schedule-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:.5rem}
+.sched-day{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:.65rem;min-height:80px}
+.sched-day-label{font-family:'JetBrains Mono',monospace;font-size:.6rem;font-weight:700;color:var(--text3);margin-bottom:.5rem;text-transform:uppercase;letter-spacing:.05em}
+.sched-block{background:var(--surface2);border-radius:4px;padding:.3rem .4rem;margin-bottom:.3rem;cursor:pointer;transition:all .15s;border-left:2px solid var(--accent)}
+.sched-block:hover{opacity:.8}
+.sched-block.done{border-left-color:var(--green);opacity:.6}
+.sched-block.done .sched-block-title{text-decoration:line-through;color:var(--text3)}
+.sched-tag{font-family:'JetBrains Mono',monospace;font-size:.55rem;color:var(--accent);margin-bottom:.1rem}
+.sched-block.done .sched-tag{color:var(--green)}
+.sched-block-title{font-size:.7rem;color:var(--text);line-height:1.3}
+.sched-time{font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--text3)}
+
+/* ─── NOTES ─── */
+.notes-wrap{}
+.notes-input{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:.875rem;color:var(--text);font-family:'Instrument Sans',sans-serif;font-size:.82rem;line-height:1.6;resize:none;min-height:80px;transition:border-color .15s;outline:none}
+.notes-input:focus{border-color:var(--accent)}
+.notes-add-btn{margin-top:.5rem;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text2);font-size:.78rem;font-family:'JetBrains Mono',monospace;padding:.4rem 1rem;cursor:pointer;transition:all .15s}
+.notes-add-btn:hover{background:var(--accent-dim);border-color:var(--accent);color:var(--accent)}
+.notes-list{margin-top:.875rem;display:flex;flex-direction:column;gap:.4rem}
+.note-item{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:.6rem .875rem;display:flex;justify-content:space-between;align-items:flex-start;gap:.75rem}
+.note-text{font-size:.8rem;color:var(--text2);line-height:1.5;flex:1}
+.note-meta{font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--text3);white-space:nowrap;flex-shrink:0}
+.note-del{background:none;border:none;color:var(--text3);cursor:pointer;font-size:.7rem;padding:.1rem .2rem;transition:color .15s;flex-shrink:0}
+.note-del:hover{color:var(--coral)}
+
+/* ─── TOAST ─── */
+#toast{position:fixed;bottom:2rem;right:2rem;z-index:999;display:flex;flex-direction:column;gap:.4rem;pointer-events:none}
+.toast-item{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:.5rem 1rem;font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--accent);box-shadow:0 4px 16px rgba(0,0,0,.4);animation:toastin .3s ease;pointer-events:none}
+.toast-item.out{animation:toastout .3s ease forwards}
+@keyframes toastin{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes toastout{to{opacity:0;transform:translateY(10px)}}
+
+/* ─── RESPONSIVE ─── */
+@media(max-width:900px){
+  #sidebar{display:none}
+  .main-inner{padding:1rem}
+  .stats-row{grid-template-columns:repeat(2,1fr)}
+  .dsa-wrap{grid-template-columns:1fr}
+  .schedule-grid{grid-template-columns:repeat(4,1fr)}
+  .phase-sections{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+  .stats-row{grid-template-columns:repeat(2,1fr)}
+  .schedule-grid{grid-template-columns:repeat(2,1fr)}
+  .lang-grid{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="loader-logo">dev<span>//</span>roadmap</div>
+  <div class="loader-bar"><div class="loader-fill"></div></div>
+  <div class="loader-text">loading progress...</div>
+</div>
+
+<!-- SIDEBAR -->
+<nav id="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-logo">Dev<span>//</span>Roadmap</div>
+    <div class="sidebar-sub">progress v2.0</div>
+  </div>
+  <div class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-label">Engineering</div>
+      <div class="nav-item active" onclick="scrollTo('engineering')"><span class="nav-dot"></span>Engineering Roadmap</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Languages</div>
+      <div class="nav-item" onclick="scrollTo('languages')"><span class="nav-dot"></span>Language Progress</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Tracking</div>
+      <div class="nav-item" onclick="scrollTo('dsa')"><span class="nav-dot"></span>DSA Tracker</div>
+      <div class="nav-item" onclick="scrollTo('schedule')"><span class="nav-dot"></span>Weekly Schedule</div>
+      <div class="nav-item" onclick="scrollTo('notes')"><span class="nav-dot"></span>Notes</div>
+    </div>
+  </div>
+  <div class="sidebar-footer">
+    <div class="xp-level" id="sb-level">⚡ Level 1</div>
+    <div class="xp-label" id="sb-xp-label">XP: 0 / 500</div>
+    <div class="xp-bar-wrap"><div class="xp-bar-fill" id="sb-xp-bar" style="width:0%"></div></div>
+    <div class="sync-dot" id="sync-indicator">synced</div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<main id="main">
+  <div class="main-inner">
+
+    <!-- TOP BAR -->
+    <div class="topbar">
+      <div class="topbar-left">
+        <h1>Engineering Roadmap Dashboard</h1>
+        <div class="date" id="top-date"></div>
+      </div>
+      <div class="streak-badge" id="streak-badge">🔥 <span id="streak-num">0</span> day streak</div>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-val" id="stat-overall">0<span>%</span></div>
+        <div class="stat-label">overall progress</div>
+        <div class="stat-bar"><div class="stat-bar-fill" id="stat-overall-bar" style="width:0%"></div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val" id="stat-skills">0<span>/48</span></div>
+        <div class="stat-label">skills completed</div>
+        <div class="stat-bar"><div class="stat-bar-fill" id="stat-skills-bar" style="width:0%"></div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val" id="stat-dsa">0</div>
+        <div class="stat-label">dsa problems</div>
+        <div class="stat-bar"><div class="stat-bar-fill" id="stat-dsa-bar" style="width:0%"></div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val" id="stat-proj">0</div>
+        <div class="stat-label">projects built</div>
+        <div class="stat-bar"><div class="stat-bar-fill" id="stat-proj-bar" style="width:0%"></div></div>
+      </div>
+    </div>
+
+    <!-- ENGINEERING -->
+    <div id="engineering">
+      <div class="section-header">
+        <div class="section-title">Engineering Roadmap</div>
+        <div class="section-count" id="eng-count">0 / 9 phases</div>
+      </div>
+      <div class="phase-list" id="phase-list"></div>
+    </div>
+
+    <!-- LANGUAGES -->
+    <div id="languages">
+      <div class="section-header">
+        <div class="section-title">Language Progress</div>
+        <div class="section-count" id="lang-total-sessions">0 total sessions</div>
+      </div>
+      <div id="lang-container"></div>
+    </div>
+
+    <!-- DSA -->
+    <div id="dsa">
+      <div class="section-header">
+        <div class="section-title">DSA Tracker</div>
+        <div class="section-count" id="dsa-total">0 / 210 problems</div>
+      </div>
+      <div class="dsa-wrap">
+        <div class="dsa-heatmap-section">
+          <div class="dsa-heatmap-label">26-week activity heatmap · click to log intensity</div>
+          <div class="heatmap-grid" id="heatmap-grid"></div>
+        </div>
+        <div class="dsa-topics-section">
+          <div class="dsa-heatmap-label">topics · click bar to log +1 problem</div>
+          <div id="topic-rows"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCHEDULE -->
+    <div id="schedule">
+      <div class="section-header">
+        <div class="section-title">This Week</div>
+        <div class="section-count" id="sched-count">0 / 7 days done</div>
+      </div>
+      <div class="schedule-grid" id="schedule-grid"></div>
+    </div>
+
+    <!-- NOTES -->
+    <div id="notes">
+      <div class="section-header">
+        <div class="section-title">Notes &amp; Reflections</div>
+        <div class="section-count" id="notes-count">0 entries</div>
+      </div>
+      <div class="notes-wrap">
+        <textarea class="notes-input" id="notes-input" placeholder="Add a reflection, insight, or reminder..."></textarea>
+        <button class="notes-add-btn" onclick="addNote()">+ Add Note</button>
+        <div class="notes-list" id="notes-list"></div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script>
+// ─── DATA DEFINITIONS ───────────────────────────────────────────
+
+const PHASES = [
+  {
+    id:'p1',num:'P1',title:'Core Foundation',duration:'0–6 months',
+    learn:['Java OOP & core concepts','Python basics + scripting','DSA: arrays, linked lists, trees','PostgreSQL: CRUD, joins, indexes','REST APIs + HTTP fundamentals'],
+    build:['CRUD backend app','REST API service','Simple data layer'],
+    skills:['Java','Python','DSA','PostgreSQL','REST APIs']
+  },
+  {
+    id:'p2',num:'P2',title:'Backend + Systems',duration:'6–12 months',
+    learn:['Spring Boot framework','JWT authentication + OAuth2','Redis caching strategies','Database optimization','Docker basics + containers'],
+    build:['Auth system w/ JWT','Blog REST API','E-commerce backend'],
+    skills:['Spring Boot','Auth','Redis','Docker']
+  },
+  {
+    id:'p3',num:'P3',title:'AI + Backend Integration',duration:'1–2 years',
+    learn:['Python advanced (async, typing)','Prompt engineering techniques','RAG (Retrieval Augmented Gen)','AI agents + tool use','n8n automation workflows'],
+    build:['AI chatbot w/ memory','Document search system','Automation workflow pipeline'],
+    skills:['Python (adv)','RAG','AI Agents','n8n']
+  },
+  {
+    id:'p4',num:'P4',title:'Advanced Systems',duration:'2–3 years',
+    learn:['CI/CD pipelines deep dive','NGINX config + load balancing','Terraform + IaC','Agentic AI architectures','Multi-agent systems + LLMOps'],
+    build:['Auto-deploy pipeline','Production AI agent','Workflow automation suite'],
+    skills:['CI/CD','Terraform','DevOps','LLMOps']
+  },
+  {
+    id:'p5',num:'P5',title:'Top Company Prep',duration:'3–4 years',
+    learn:['DSA: 300–500 problems (LeetCode hard)','System design patterns','Horizontal + vertical scaling','Load balancing + CDNs','Distributed systems fundamentals'],
+    build:['Design: Instagram clone','Design: Amazon/e-commerce','URL shortener + analytics'],
+    skills:['System Design','Scalability','Distributed Systems']
+  },
+  {
+    id:'p6',num:'P6',title:'Cloud Mastery',duration:'Year 4+',
+    learn:['AWS / GCP core services','Kubernetes orchestration','Service mesh (Istio)','Cloud cost optimization','Security best practices'],
+    build:['K8s production cluster','Multi-cloud deployment','Cost-optimized architecture'],
+    skills:['AWS/GCP','Kubernetes','Cloud Architecture']
+  },
+  {
+    id:'p7',num:'P7',title:'Product Building',duration:'Ongoing',
+    learn:['Product thinking + strategy','User research methods','Growth engineering','Monetization models','Analytics + A/B testing'],
+    build:['SaaS MVP','Landing page + waitlist','Payment integration'],
+    skills:['Product','Growth','Monetization']
+  },
+  {
+    id:'p8',num:'P8',title:'Open Source',duration:'Ongoing',
+    learn:['Contributing to major OSS projects','Writing excellent documentation','Managing issues + PRs','Building a public OSS portfolio','Community building'],
+    build:['Significant OSS contribution','Own OSS library/tool','Technical blog posts'],
+    skills:['Open Source','Documentation','Community']
+  },
+  {
+    id:'p9',num:'P9',title:'Specialization',duration:'Year 5+',
+    learn:['Deep specialization track','Research paper reading','Conference talks','Technical leadership','Mentorship + teaching'],
+    build:['Domain expert project','Technical talks','Team/mentor leadership'],
+    skills:['Expertise','Leadership','Teaching']
+  }
+];
+
+const LANGUAGES = [
+  {id:0,flag:'🇬🇧',name:'English',tier:'Tier 1',tierSub:'Core',goal:100},
+  {id:1,flag:'🇮🇳',name:'Hindi',tier:'Tier 1',tierSub:'Core',goal:80},
+  {id:2,flag:'🇪🇸',name:'Spanish',tier:'Tier 1',tierSub:'Core',goal:70},
+  {id:3,flag:'🇨🇳',name:'Mandarin',tier:'Tier 2',tierSub:'Strategic',goal:50},
+  {id:4,flag:'🇯🇵',name:'Japanese',tier:'Tier 2',tierSub:'Strategic',goal:60},
+  {id:5,flag:'🇷🇺',name:'Russian',tier:'Tier 2',tierSub:'Strategic',goal:60},
+  {id:6,flag:'🇸🇦',name:'Arabic',tier:'Tier 2',tierSub:'Strategic',goal:50},
+  {id:7,flag:'🇰🇷',name:'Korean',tier:'Tier 3',tierSub:'Cultural',goal:50},
+  {id:8,flag:'🇩🇪',name:'German',tier:'Tier 3',tierSub:'Cultural',goal:50},
+  {id:9,flag:'🇫🇷',name:'French',tier:'Tier 3',tierSub:'Cultural',goal:50},
+  {id:10,flag:'🇮🇳',name:'Tamil',tier:'Tier 4',tierSub:'Indian',goal:70},
+  {id:11,flag:'🇮🇳',name:'Telugu',tier:'Tier 4',tierSub:'Indian',goal:60},
+  {id:12,flag:'🇮🇳',name:'Kannada',tier:'Tier 4',tierSub:'Indian',goal:60},
+  {id:13,flag:'🇮🇳',name:'Malayalam',tier:'Tier 4',tierSub:'Indian',goal:60},
+];
+
+const DSA_TOPICS = [
+  {name:'Arrays & Strings',target:40,color:'#7b6fff'},
+  {name:'Hashmaps',target:25,color:'#60a5fa'},
+  {name:'Linked Lists',target:20,color:'#34d399'},
+  {name:'Trees / BST',target:30,color:'#fbbf24'},
+  {name:'Two Pointers',target:20,color:'#f472b6'},
+  {name:'Sliding Window',target:15,color:'#a78bfa'},
+  {name:'Dynamic Prog.',target:35,color:'#fb7185'},
+  {name:'Graphs',target:25,color:'#4ade80'},
+];
+
+const SCHEDULE_TEMPLATE = [
+  [{tag:'Java',title:'OOP + interfaces',time:'2h'},{tag:'DSA',title:'Arrays warmup',time:'45m'}],
+  [{tag:'DSA',title:'LeetCode easy ×3',time:'1.5h'},{tag:'DB',title:'PostgreSQL joins',time:'1h'}],
+  [{tag:'Spring',title:'REST endpoints',time:'2.5h'},{tag:'Lang',title:'Spanish speaking',time:'30m'}],
+  [{tag:'DSA',title:'Two pointers',time:'1.5h'},{tag:'Project',title:'CRUD API build',time:'2h'}],
+  [{tag:'Review',title:'Week review',time:'1h'},{tag:'Lang',title:'Hindi vocab',time:'30m'}],
+  [{tag:'Project',title:'Deep build session',time:'3h'},{tag:'DSA',title:'Trees practice',time:'1h'}],
+  [{tag:'Review',title:'Rest + reflect',time:'1h'},{tag:'Lang',title:'Free practice',time:'45m'}],
+];
+
+const XP_REWARDS = {learn:50,build:200,dsa:30,schedule:80,lang:40};
+
+// ─── STATE ──────────────────────────────────────────────────────
+let S = {
+  learnChecked:{},projectBuilt:{},phaseOpen:{},
+  dsaTopics:{},dsaHeatmap:[],
+  langPct:{},langSessions:{},
+  schedule:{},notes:[],xp:0,streak:0,lastActive:''
+};
+
+// ─── SAVE ───────────────────────────────────────────────────────
+let saveTimer = null;
+const syncEl = document.getElementById('sync-indicator');
+
+function triggerSave() {
+  setSyncState('saving');
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(async () => {
+    try {
+      const r = await fetch('/api/state/bulk', {
+        method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify(S)
+      });
+      if(r.ok) setSyncState('synced');
+      else setSyncState('error');
+    } catch {
+      setSyncState('error');
+    }
+  }, 600);
+}
+
+function setSyncState(s) {
+  syncEl.className = 'sync-dot ' + (s !== 'synced' ? s : '');
+  syncEl.textContent = s === 'saving' ? 'saving...' : s === 'error' ? 'offline' : 'synced';
+}
+
+// ─── LOAD ────────────────────────────────────────────────────────
+async function loadState() {
+  try {
+    const r = await fetch('/api/state');
+    if(r.ok) {
+      const data = await r.json();
+      Object.assign(S, data);
+      if(!Array.isArray(S.dsaHeatmap) || S.dsaHeatmap.length !== 182) S.dsaHeatmap = new Array(182).fill(0);
+      if(!Array.isArray(S.notes)) S.notes = [];
+    }
+  } catch {
+    setSyncState('error');
+  }
+}
+
+// ─── XP ─────────────────────────────────────────────────────────
+function addXP(type, label) {
+  const gain = XP_REWARDS[type] || 0;
+  S.xp = (S.xp || 0) + gain;
+  updateXPDisplay();
+  showToast(`+${gain} XP · ${label}`);
+  triggerSave();
+}
+
+function updateXPDisplay() {
+  const xp = S.xp || 0;
+  const level = Math.floor(xp / 500) + 1;
+  const progress = (xp % 500) / 500 * 100;
+  const next = level * 500;
+  document.getElementById('sb-level').textContent = `⚡ Level ${level}`;
+  document.getElementById('sb-xp-label').textContent = `XP: ${xp} / ${next}`;
+  document.getElementById('sb-xp-bar').style.width = progress + '%';
+}
+
+// ─── TOAST ──────────────────────────────────────────────────────
+function showToast(msg) {
+  const wrap = document.getElementById('toast');
+  const el = document.createElement('div');
+  el.className = 'toast-item';
+  el.textContent = msg;
+  wrap.appendChild(el);
+  setTimeout(() => { el.className = 'toast-item out'; setTimeout(() => el.remove(), 300); }, 2000);
+}
+
+// ─── PHASES ─────────────────────────────────────────────────────
+function renderPhases() {
+  const container = document.getElementById('phase-list');
+  container.innerHTML = '';
+  PHASES.forEach((p, pi) => {
+    const open = S.phaseOpen[p.id] || false;
+    const card = document.createElement('div');
+    card.className = 'phase-card' + (open ? ' open' : '');
+    card.id = 'phase-' + p.id;
+    const learnTotal = p.learn.length;
+    const buildTotal = p.build.length;
+    const learnDone = p.learn.filter((_,i) => S.learnChecked[`${p.id}_l${i}`]).length;
+    const buildDone = p.build.filter((_,i) => S.projectBuilt[`${p.id}_b${i}`]).length;
+    const pct = Math.round((learnDone + buildDone) / (learnTotal + buildTotal) * 100);
+    const statusClass = pct === 100 ? 'done' : pct > 0 ? 'active' : 'locked';
+    const statusText = pct === 100 ? '✓ complete' : pct > 0 ? '◉ in progress' : '○ locked';
+
+    card.innerHTML = `
+      <div class="phase-header" onclick="togglePhase('${p.id}')">
+        <span class="phase-num">${p.num}</span>
+        <span class="phase-title">${p.title}</span>
+        <span class="phase-duration">${p.duration}</span>
+        <div class="phase-mini-bar"><div class="phase-mini-fill" style="width:${pct}%"></div></div>
+        <span class="phase-pct">${pct}%</span>
+        <span class="phase-chevron">▶</span>
+      </div>
+      <div class="phase-body">
+        <div class="phase-sections">
+          <div>
+            <div class="phase-section-label">📚 Learn (${learnDone}/${learnTotal})</div>
+            ${p.learn.map((item,i) => `
+              <label class="check-item">
+                <input type="checkbox" ${S.learnChecked[`${p.id}_l${i}`] ? 'checked' : ''}
+                  onchange="toggleLearn('${p.id}',${i},this.checked)" />
+                <label>${item}</label>
+              </label>`).join('')}
+          </div>
+          <div>
+            <div class="phase-section-label">🚀 Build (${buildDone}/${buildTotal})</div>
+            <div class="project-chips">
+              ${p.build.map((b,i) => `
+                <span class="proj-chip ${S.projectBuilt[`${p.id}_b${i}`] ? 'built' : ''}"
+                  onclick="toggleBuild('${p.id}',${i})">${b}</span>`).join('')}
+            </div>
+            <div class="status-badge ${statusClass}" style="margin-top:.875rem">${statusText}</div>
+            <div class="phase-progress-bar">
+              <div class="phase-progress-fill" style="width:${pct}%"></div>
+            </div>
+          </div>
+        </div>
+      </div>`;
+    container.appendChild(card);
+  });
+  updateEngStats();
+}
+
+function togglePhase(id) {
+  S.phaseOpen[id] = !S.phaseOpen[id];
+  const card = document.getElementById('phase-' + id);
+  card.classList.toggle('open', S.phaseOpen[id]);
+  triggerSave();
+}
+
+function toggleLearn(phaseId, idx, checked) {
+  const key = `${phaseId}_l${idx}`;
+  S.learnChecked[key] = checked;
+  if(checked) addXP('learn', 'learn item checked');
+  else triggerSave();
+  updatePhaseCard(phaseId);
+  updateEngStats();
+}
+
+function toggleBuild(phaseId, idx) {
+  const key = `${phaseId}_b${idx}`;
+  S.projectBuilt[key] = !S.projectBuilt[key];
+  if(S.projectBuilt[key]) addXP('build', 'project built!');
+  else triggerSave();
+  updatePhaseCard(phaseId);
+  updateEngStats();
+}
+
+function updatePhaseCard(phaseId) {
+  const p = PHASES.find(x => x.id === phaseId);
+  if(!p) return;
+  const learnDone = p.learn.filter((_,i) => S.learnChecked[`${p.id}_l${i}`]).length;
+  const buildDone = p.build.filter((_,i) => S.projectBuilt[`${p.id}_b${i}`]).length;
+  const pct = Math.round((learnDone + buildDone) / (p.learn.length + p.build.length) * 100);
+  const card = document.getElementById('phase-' + phaseId);
+  if(!card) return;
+  card.querySelector('.phase-mini-fill').style.width = pct + '%';
+  card.querySelector('.phase-pct').textContent = pct + '%';
+  card.querySelector('.phase-progress-fill').style.width = pct + '%';
+  // update section labels
+  const labels = card.querySelectorAll('.phase-section-label');
+  if(labels[0]) labels[0].textContent = `📚 Learn (${learnDone}/${p.learn.length})`;
+  if(labels[1]) labels[1].textContent = `🚀 Build (${buildDone}/${p.build.length})`;
+  // update status badge
+  const badge = card.querySelector('.status-badge');
+  if(badge) {
+    badge.className = 'status-badge ' + (pct===100?'done':pct>0?'active':'locked');
+    badge.textContent = pct===100?'✓ complete':pct>0?'◉ in progress':'○ locked';
+  }
+  // update build chips
+  const chips = card.querySelectorAll('.proj-chip');
+  chips.forEach((chip,i) => chip.classList.toggle('built', !!S.projectBuilt[`${phaseId}_b${i}`]));
+}
+
+function updateEngStats() {
+  let totalLearn = 0, doneLearn = 0, totalBuild = 0, doneBuild = 0, phaseDone = 0;
+  PHASES.forEach(p => {
+    totalLearn += p.learn.length;
+    totalBuild += p.build.length;
+    const ld = p.learn.filter((_,i) => S.learnChecked[`${p.id}_l${i}`]).length;
+    const bd = p.build.filter((_,i) => S.projectBuilt[`${p.id}_b${i}`]).length;
+    doneLearn += ld; doneBuild += bd;
+    if(ld + bd === p.learn.length + p.build.length) phaseDone++;
+  });
+  const total = totalLearn + totalBuild;
+  const done = doneLearn + doneBuild;
+  const pct = total > 0 ? Math.round(done/total*100) : 0;
+  document.getElementById('stat-overall').innerHTML = `${pct}<span>%</span>`;
+  document.getElementById('stat-overall-bar').style.width = pct+'%';
+  document.getElementById('stat-skills').innerHTML = `${doneLearn}<span>/${totalLearn}</span>`;
+  document.getElementById('stat-skills-bar').style.width = (doneLearn/totalLearn*100)+'%';
+  document.getElementById('stat-proj').textContent = doneBuild;
+  document.getElementById('stat-proj-bar').style.width = (doneBuild/totalBuild*100)+'%';
+  document.getElementById('eng-count').textContent = `${phaseDone} / 9 phases`;
+}
+
+// ─── LANGUAGES ───────────────────────────────────────────────────
+function renderLanguages() {
+  const container = document.getElementById('lang-container');
+  container.innerHTML = '';
+  const tiers = ['Tier 1','Tier 2','Tier 3','Tier 4'];
+  const tierLabels = {'Tier 1':'Tier 1: Core (6–12 months)','Tier 2':'Tier 2: Strategic (Year 2–3)','Tier 3':'Tier 3: Cultural (Year 3+)','Tier 4':'Tier 4: Indian Languages'};
+  tiers.forEach(tier => {
+    const langs = LANGUAGES.filter(l => l.tier === tier);
+    const label = document.createElement('div');
+    label.className = 'lang-tier-label';
+    label.textContent = tierLabels[tier];
+    container.appendChild(label);
+    const grid = document.createElement('div');
+    grid.className = 'lang-grid';
+    langs.forEach(lang => {
+      const pct = S.langPct[lang.id] || 0;
+      const sess = S.langSessions[lang.id] || 0;
+      const card = document.createElement('div');
+      card.className = 'lang-card';
+      card.id = 'lang-' + lang.id;
+      card.innerHTML = `
+        <div class="lang-flag">${lang.flag}</div>
+        <div class="lang-name">${lang.name}</div>
+        <div class="lang-tier-tag">${lang.tier} · goal: ${lang.goal}%</div>
+        <div class="lang-fluency-bar"><div class="lang-fluency-fill" id="lf-${lang.id}" style="width:${pct}%"></div></div>
+        <div class="lang-stats">
+          <span class="lang-pct" id="lp-${lang.id}">${pct}%</span>
+          <span class="lang-sess" id="ls-${lang.id}">${sess} sessions</span>
+        </div>
+        <button class="lang-btn" onclick="addLangSession(${lang.id})">+ session</button>`;
+      grid.appendChild(card);
+    });
+    container.appendChild(grid);
+  });
+  updateLangStats();
+}
+
+function addLangSession(id) {
+  S.langSessions[id] = (S.langSessions[id] || 0) + 1;
+  // Increment fluency: diminishing returns
+  const curr = S.langPct[id] || 0;
+  const goal = LANGUAGES.find(l=>l.id===id).goal;
+  const inc = Math.max(0.5, (goal - curr) * 0.04);
+  S.langPct[id] = Math.min(100, +(curr + inc).toFixed(1));
+  document.getElementById('lf-'+id).style.width = S.langPct[id]+'%';
+  document.getElementById('lp-'+id).textContent = S.langPct[id]+'%';
+  document.getElementById('ls-'+id).textContent = S.langSessions[id]+' sessions';
+  addXP('lang', LANGUAGES.find(l=>l.id===id).name + ' session');
+  updateLangStats();
+}
+
+function updateLangStats() {
+  const total = Object.values(S.langSessions).reduce((a,b)=>a+(b||0),0);
+  document.getElementById('lang-total-sessions').textContent = total + ' total sessions';
+}
+
+// ─── DSA ─────────────────────────────────────────────────────────
+function renderHeatmap() {
+  const grid = document.getElementById('heatmap-grid');
+  grid.innerHTML = '';
+  for(let i=0; i<182; i++) {
+    const cell = document.createElement('div');
+    cell.className = 'hm-cell';
+    cell.dataset.v = S.dsaHeatmap[i] || 0;
+    cell.title = `Day ${i+1}`;
+    cell.addEventListener('click', () => {
+      const v = ((S.dsaHeatmap[i] || 0) + 1) % 5;
+      S.dsaHeatmap[i] = v;
+      cell.dataset.v = v;
+      if(v > 0) { S.xp = (S.xp||0) + 30; updateXPDisplay(); showToast('+30 XP · DSA session logged'); }
+      triggerSave();
+    });
+    grid.appendChild(cell);
+  }
+}
+
+function renderTopics() {
+  const container = document.getElementById('topic-rows');
+  container.innerHTML = '';
+  DSA_TOPICS.forEach((t,i) => {
+    const done = S.dsaTopics[i] || 0;
+    const pct = Math.min(100, done / t.target * 100);
+    const row = document.createElement('div');
+    row.className = 'topic-row';
+    row.innerHTML = `
+      <span class="topic-name">${t.name}</span>
+      <div class="topic-bar-wrap" onclick="logDSA(${i})" title="+1 problem">
+        <div class="topic-bar-fill" id="tb-${i}" style="width:${pct}%;background:${t.color}"></div>
+      </div>
+      <span class="topic-count" id="tc-${i}">${done}/${t.target}</span>`;
+    container.appendChild(row);
+  });
+  updateDSAStats();
+}
+
+function logDSA(idx) {
+  S.dsaTopics[idx] = (S.dsaTopics[idx] || 0) + 1;
+  const done = S.dsaTopics[idx];
+  const pct = Math.min(100, done / DSA_TOPICS[idx].target * 100);
+  document.getElementById('tb-'+idx).style.width = pct+'%';
+  document.getElementById('tc-'+idx).textContent = `${done}/${DSA_TOPICS[idx].target}`;
+  addXP('dsa', DSA_TOPICS[idx].name + ' +1');
+  updateDSAStats();
+}
+
+function updateDSAStats() {
+  const total = Object.values(S.dsaTopics).reduce((a,b)=>a+(b||0),0);
+  const max = 210;
+  document.getElementById('stat-dsa').textContent = total;
+  document.getElementById('stat-dsa-bar').style.width = Math.min(100,total/max*100)+'%';
+  document.getElementById('dsa-total').textContent = `${total} / ${max} problems`;
+}
+
+// ─── SCHEDULE ────────────────────────────────────────────────────
+function renderSchedule() {
+  const grid = document.getElementById('schedule-grid');
+  grid.innerHTML = '';
+  const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  days.forEach((day,di) => {
+    const col = document.createElement('div');
+    col.className = 'sched-day';
+    col.innerHTML = `<div class="sched-day-label">${day}</div>`;
+    SCHEDULE_TEMPLATE[di].forEach((block,bi) => {
+      const key = `${di}_${bi}`;
+      const done = S.schedule[key] || false;
+      const el = document.createElement('div');
+      el.className = 'sched-block' + (done ? ' done' : '');
+      el.id = 'sb-'+key;
+      el.innerHTML = `<div class="sched-tag">${block.tag}</div><div class="sched-block-title">${block.title}</div><div class="sched-time">${block.time}</div>`;
+      el.addEventListener('click', () => toggleSchedule(key, block));
+      col.appendChild(el);
+    });
+    grid.appendChild(col);
+  });
+  updateSchedStats();
+}
+
+function toggleSchedule(key, block) {
+  const wasDone = S.schedule[key] || false;
+  S.schedule[key] = !wasDone;
+  const el = document.getElementById('sb-'+key);
+  if(el) el.classList.toggle('done', S.schedule[key]);
+  if(S.schedule[key]) addXP('schedule', block.tag + ' done');
+  else triggerSave();
+  updateSchedStats();
+}
+
+function updateSchedStats() {
+  const done = Object.values(S.schedule).filter(Boolean).length;
+  document.getElementById('sched-count').textContent = `${done} blocks done`;
+}
+
+// ─── NOTES ───────────────────────────────────────────────────────
+function addNote() {
+  const input = document.getElementById('notes-input');
+  const text = input.value.trim();
+  if(!text) return;
+  S.notes.unshift({text, date: new Date().toLocaleDateString()});
+  input.value = '';
+  renderNotes();
+  triggerSave();
+}
+
+function deleteNote(idx) {
+  S.notes.splice(idx,1);
+  renderNotes();
+  triggerSave();
+}
+
+function renderNotes() {
+  const list = document.getElementById('notes-list');
+  list.innerHTML = '';
+  (S.notes || []).forEach((note,i) => {
+    const el = document.createElement('div');
+    el.className = 'note-item';
+    el.innerHTML = `
+      <div class="note-text">${escHtml(note.text)}</div>
+      <div class="note-meta">${note.date}</div>
+      <button class="note-del" onclick="deleteNote(${i})">✕</button>`;
+    list.appendChild(el);
+  });
+  document.getElementById('notes-count').textContent = (S.notes||[]).length + ' entries';
+}
+
+function escHtml(t) {
+  return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ─── MISC ────────────────────────────────────────────────────────
+function setDate() {
+  const now = new Date();
+  const opts = {weekday:'long',year:'numeric',month:'long',day:'numeric'};
+  document.getElementById('top-date').textContent = now.toLocaleDateString('en-US', opts);
+  document.getElementById('streak-num').textContent = S.streak || 0;
+}
+
+function scrollTo(id) {
+  document.getElementById(id).scrollIntoView({behavior:'smooth',block:'start'});
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+}
+
+// Enter key for notes
+document.getElementById('notes-input').addEventListener('keydown', e => {
+  if(e.key === 'Enter' && (e.ctrlKey || e.metaKey)) addNote();
+});
+
+// ─── INIT ────────────────────────────────────────────────────────
+async function init() {
+  await loadState();
+  setDate();
+  renderPhases();
+  renderLanguages();
+  renderHeatmap();
+  renderTopics();
+  renderSchedule();
+  renderNotes();
+  updateXPDisplay();
+  updateEngStats();
+  // hide loader
+  setTimeout(() => {
+    document.getElementById('loader').classList.add('hide');
+  }, 600);
+}
+
+init();
+</script>
+</body>
+</html>
