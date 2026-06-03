@@ -632,6 +632,7 @@ function toggleLearn(phaseId, idx, checked) {
   else triggerSave();
   updatePhaseCard(phaseId);
   updateEngStats();
+  recalculateXP();
 }
 
 function toggleBuild(phaseId, idx) {
@@ -641,6 +642,7 @@ function toggleBuild(phaseId, idx) {
   else triggerSave();
   updatePhaseCard(phaseId);
   updateEngStats();
+  recalculateXP();
 }
 
 function updatePhaseCard(phaseId) {
@@ -740,6 +742,7 @@ function addLangSession(id) {
   document.getElementById('ls-'+id).textContent = S.langSessions[id]+' sessions';
   addXP('lang', LANGUAGES.find(l=>l.id===id).name + ' session');
   updateLangStats();
+  recalculateXP();
 }
 
 function updateLangStats() {
@@ -794,6 +797,7 @@ function logDSA(idx) {
   document.getElementById('tc-'+idx).textContent = `${done}/${DSA_TOPICS[idx].target}`;
   addXP('dsa', DSA_TOPICS[idx].name + ' +1');
   updateDSAStats();
+  recalculateXP();
 }
 
 function updateDSAStats() {
@@ -836,6 +840,7 @@ function toggleSchedule(key, block) {
   if(S.schedule[key]) addXP('schedule', block.tag + ' done');
   else triggerSave();
   updateSchedStats();
+  recalculateXP();
 }
 
 function updateSchedStats() {
