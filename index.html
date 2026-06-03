@@ -530,6 +530,28 @@ function updateXPDisplay() {
   document.getElementById('sb-xp-bar').style.width = progress + '%';
 }
 
+function recalculateXP() {
+  let xp = 0;
+
+  xp += Object.values(S.learnChecked)
+    .filter(Boolean).length * XP_REWARDS.learn;
+
+  xp += Object.values(S.projectBuilt)
+    .filter(Boolean).length * XP_REWARDS.build;
+
+  xp += Object.values(S.schedule)
+    .filter(Boolean).length * XP_REWARDS.schedule;
+
+  xp += Object.values(S.langSessions)
+    .reduce((a,b)=>a+b,0) * XP_REWARDS.lang;
+
+  xp += Object.values(S.dsaTopics)
+    .reduce((a,b)=>a+b,0) * XP_REWARDS.dsa;
+
+  S.xp = xp;
+  updateXPDisplay();
+}
+
 // ─── TOAST ──────────────────────────────────────────────────────
 function showToast(msg) {
   const wrap = document.getElementById('toast');
@@ -886,7 +908,7 @@ async function init() {
   renderTopics();
   renderSchedule();
   renderNotes();
-  updateXPDisplay();
+  recalculateXP();
   updateEngStats();
   // hide loader
   setTimeout(() => {
